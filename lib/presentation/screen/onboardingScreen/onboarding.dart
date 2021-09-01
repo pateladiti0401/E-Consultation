@@ -1,8 +1,10 @@
+import 'package:e_consultation/core/constant/approute.dart';
 import 'package:e_consultation/core/constant/customColors.dart';
 import 'package:e_consultation/data/model/onboardingModel.dart';
 import 'package:e_consultation/presentation/screen/Auth/startPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class OnBoardingView extends StatefulWidget {
   const OnBoardingView({Key? key}) : super(key: key);
@@ -25,6 +27,12 @@ class _OnBoardingViewState extends State<OnBoardingView> {
     _pageController.dispose();
   }
 
+  onboardingInfo() async {
+    int isViewed = 0;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('onBoard', isViewed);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,10 +41,14 @@ class _OnBoardingViewState extends State<OnBoardingView> {
         backgroundColor: CustomColors.backgroundColor,
         actions: [
           TextButton(
-              onPressed: () {},
+              onPressed: () async {
+                await onboardingInfo();
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => StartPage()));
+              },
               child: Text(
                 'Skip',
-                style: TextStyle(color: CustomColors.green),
+                style: TextStyle(color: CustomColors.orange),
               ))
         ],
       ),
@@ -73,10 +85,12 @@ class _OnBoardingViewState extends State<OnBoardingView> {
                               children: [
                                 Container(
                                   margin: EdgeInsets.symmetric(horizontal: 3),
-                                  width: _currentIndex == index ? 20 : 8,
+                                  width: _currentIndex == index ? 30 : 8,
                                   height: 8,
                                   decoration: BoxDecoration(
-                                    color: CustomColors.green,
+                                    color: _currentIndex == index
+                                        ? CustomColors.blue
+                                        : CustomColors.lightBlue,
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                 )
@@ -98,46 +112,47 @@ class _OnBoardingViewState extends State<OnBoardingView> {
                       style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
-                          color: CustomColors.green),
+                          color: CustomColors.blue),
                     ),
                     InkWell(
-                      onTap: () {
+                      onTap: () async {
                         if (index == screen.length - 1) {
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (_) => StartPage()));
+                          await onboardingInfo();
+                          Navigator.pushNamed(context, AppRouter.startPage);
                         } else {
                           _currentIndex++;
                           _pageController.nextPage(
                               duration: Duration(microseconds: 300),
-                              curve: Curves.easeInSine);
+                              curve: Curves.easeInToLinear);
                         }
                       },
                       child: Container(
-                          alignment: Alignment.center,
-                          height: 60,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(15),
-                              color: CustomColors.green),
-                          child: ListTile(
-                            title: Text(
-                              'Get Started',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w500),
+                        alignment: Alignment.center,
+                        height: 60,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                            color: CustomColors.blue),
+                        child: ListTile(
+                          title: Text(
+                            'Get Started',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500),
+                          ),
+                          trailing: Container(
+                            height: 30,
+                            width: 30,
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(30)),
+                            child: Icon(
+                              Icons.arrow_right_alt,
+                              color: CustomColors.blue,
                             ),
-                            trailing: Container(
-                              height: 30,
-                              width: 30,
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(30)),
-                              child: Icon(
-                                Icons.arrow_right_alt,
-                                color: CustomColors.green,
-                              ),
-                            ),
-                          )),
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),
